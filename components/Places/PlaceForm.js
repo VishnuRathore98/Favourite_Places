@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 
 import { Colors } from "../../constants/Colors";
 import { Ionicons } from '@expo/vector-icons';
 import ImagePicker from "../ImagePicker";
+import LocationPicker from "../LocationPicker";
 
 export default function PlaceForm(){
     
@@ -20,6 +21,7 @@ export default function PlaceForm(){
         </View>
 
         <ImagePicker/>
+        <LocationPicker/>
     </ScrollView>
     );
 }
