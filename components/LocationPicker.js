@@ -4,10 +4,13 @@ import { useState } from "react";
 import { Colors } from "../constants/Colors";
 
 import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
+import { useNavigation } from "@react-navigation/native";
 
 export default function LocationPicker() {
   const [locationPermissionInformation, requestPermission] =
   useForegroundPermissions();
+
+  const navigation = useNavigation();
 
 async function verifyPermissions() {
   if (
@@ -39,7 +42,15 @@ async function getLocationHandler() {
   const location = await getCurrentPositionAsync();
   console.log(location);
 }
-    function pickOnMapHandler(){}
+
+
+
+    function pickOnMapHandler(){
+      navigation.navigate('Map');
+    }
+
+
+
 
   return (
     <View>
