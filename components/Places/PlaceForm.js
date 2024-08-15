@@ -12,8 +12,9 @@ import { Ionicons } from "@expo/vector-icons";
 import ImagePicker from "../ImagePicker";
 import LocationPicker from "../LocationPicker";
 import MyButton from "../../UI/MyButton";
+import {Place} from '../../models/place';
 
-export default function PlaceForm() {
+export default function PlaceForm({onChange}) {
   const [enteredTitle, setEnteredTitle] = useState("");
   const [selectedImage, setSelectedImage] = useState();
   const [pickedLocation, setPickedLocation] = useState();
@@ -31,9 +32,11 @@ export default function PlaceForm() {
   }
 
   function addPlaceHandler(){
-    console.log("Title: ",enteredTitle);
-    console.log("Image: ",selectedImage);
-    console.log("Location: ",pickedLocation);
+    const placeData = new Place(enteredTitle, selectedImage, pickedLocation);
+    onChange(placeData);
+    // console.log("Title: ",enteredTitle);
+    // console.log("Image: ",selectedImage);
+    // console.log("Location: ",pickedLocation);
 
   }
 

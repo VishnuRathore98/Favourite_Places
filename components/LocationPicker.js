@@ -13,6 +13,7 @@ import { Colors } from "../constants/Colors";
 import {
   getCurrentPositionAsync,
   useForegroundPermissions,
+  reverseGeocodeAsync,
   PermissionStatus,
 } from "expo-location";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -35,6 +36,8 @@ export default function LocationPicker({onChangeLocation}) {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
+      
+      
     }
   }, [route]);
 

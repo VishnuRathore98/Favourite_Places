@@ -1,9 +1,15 @@
 import { StyleSheet, View, Text } from "react-native";
 import  PlaceForm  from "../components/Places/PlaceForm";
 
-export default function AddPlace(){
+export default function AddPlace({navigation}){
+    
+    function addPlaceHandler(place){
+        console.log(place);
+        // navigation.navigate('All Places', place);
+    }
+
     return(
-        <PlaceForm />
+        <PlaceForm onChange={addPlaceHandler}/>
     );
 }
 
