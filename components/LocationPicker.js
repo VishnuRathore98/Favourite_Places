@@ -1,95 +1,137 @@
-import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Alert,
+  Text,
+  Image,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Colors } from "../constants/Colors";
 
-import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
-import { useNavigation } from "@react-navigation/native";
+import {
+  getCurrentPositionAsync,
+  useForegroundPermissions,
+  PermissionStatus,
+} from "expo-location";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import MapView, { Marker } from "react-native-maps";
+import MyButton from "../UI/MyButton";
 
-export default function LocationPicker() {
+export default function LocationPicker({onChangeLocation}) {
   const [locationPermissionInformation, requestPermission] =
-  useForegroundPermissions();
+    useForegroundPermissions();
 
   const navigation = useNavigation();
+  const route = useRoute();
+  const [coordinates, setCoordinates] = useState();
 
-async function verifyPermissions() {
-  if (
-    locationPermissionInformation.status === PermissionStatus.UNDETERMINED
-  ) {
-    const permissionResponse = await requestPermission();
+  useEffect(() => {
+    if (route.params?.pickedLat) {
+      setCoordinates({
+        latitude: route.params.pickedLat,
+        longitude: route.params.pickedLng,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+    }
+  }, [route]);
 
-    return permissionResponse.granted;
-  }
+  useEffect(()=>{onChangeLocation(coordinates)},[coordinates]);
 
-  if (locationPermissionInformation.status === PermissionStatus.DENIED) {
-    Alert.alert(
-      'Insufficient Permissions!',
-      'You need to grant location permissions to use this app.'
-    );
-    return false;
-  }
+  // console.log("Route in Add Place: ", route);
+  //  = {
+  //   latitude: 16.2939335,
+  //   longitude: 63.0881563,
+  //   latitudeDelta: 0.0922,
+  //   longitudeDelta: 0.0421,
+  // }
 
-  return true;
-}
+  async function verifyPermissions() {
+    if (
+      locationPermissionInformation.status === PermissionStatus.UNDETERMINED
+    ) {
+      const permissionResponse = await requestPermission();
 
-async function getLocationHandler() {
-  const hasPermission = await verifyPermissions();
-
-  if (!hasPermission) {
-    return;
-  }
-
-  const location = await getCurrentPositionAsync();
-  console.log(location);
-}
-
-
-
-    function pickOnMapHandler(){
-      navigation.navigate('Map');
+      return permissionResponse.granted;
     }
 
+    if (locationPermissionInformation.status === PermissionStatus.DENIED) {
+      Alert.alert(
+        "Insufficient Permissions!",
+        "You need to grant location permissions to use this app."
+      );
+      return false;
+    }
 
+    return true;
+  }
 
+  async function getLocationHandler() {
+    const hasPermission = await verifyPermissions();
+
+    if (!hasPermission) {
+      return;
+    }
+
+    const location = await getCurrentPositionAsync();
+    // console.log(location);
+    setCoordinates({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+  }
+
+  function pickOnMapHandler() {
+    navigation.navigate("Map");
+  }
+
+  let mapPreview = <Text style={{color:'white'}}>No Location set yet!</Text>;
+
+  if (coordinates) {
+    mapPreview = (
+      <MapView style={styles.map} region={coordinates}>
+        <Marker
+          title='Picked Location'
+          coordinate={{
+            latitude: coordinates?.latitude,
+            longitude: coordinates?.longitude,
+          }}
+        />
+      </MapView>
+    );
+  }
 
   return (
     <View>
-      <View></View>
-      <View style={{flexDirection:'row', justifyContent:'space-around'}}>
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            borderWidth: 1,
-            borderColor: Colors.primary500,
-            marginTop: 10,
-            padding:8
-          }}
-          onPress={getLocationHandler}>
-          <Ionicons name='location' size={30} color={Colors.primary500} />
-          <Text
-            style={{ color: Colors.primary500, fontSize: 20, marginLeft: 8 }}>
-            Locate Me
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            borderWidth: 1,
-            borderColor: Colors.primary500,
-            marginTop: 10,
-            padding:8
-          }}
-          onPress={pickOnMapHandler}>
-          <Ionicons name='map' size={30} color={Colors.primary500} />
-          <Text
-            style={{ color: Colors.primary500, fontSize: 20, marginLeft: 8 }}>
-            Pick on map
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.container}>{mapPreview}</View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        
+      <MyButton icon='location' onPress={getLocationHandler}>Locate Me</MyButton>
+      <MyButton icon='map' onPress={pickOnMapHandler}>Pick on map</MyButton>
+       
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent:'center',
+    alignItems:'center',
+    borderWidth:1,
+    borderColor:'white',
+    height: 200,
+    width: "100%",
+    // marginVertical: 10,
+    borderRadius:4,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+});
