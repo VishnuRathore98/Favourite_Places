@@ -1,7 +1,5 @@
-import * as SQLite from "expo-location";
-import { err } from "react-native-svg";
+import * as SQLite from "expo-sqlite";
 import Place from "../models/place";
-// import { openDatabaseAsync } from 'expo-sqlite';
 
 const database = SQLite.openDatabase("places.db");
 
